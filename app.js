@@ -17,7 +17,7 @@ const pool = new Pool({
 });
 
 app.get('/', (req, res) => {
-  res.send('Odko iluu huurhun zaa');
+  res.send('zaa');
 });
 
 
@@ -32,7 +32,7 @@ app.get("/test", async (req, res) => {
     return res.status(500).json({ message: 'Error connecting to database' });
   }
 });
-
+//1.bvteegdehvvn nemeh
 app.post("/addProduct" , async(req , res) => {
     const { name, category, brand, price, image, description } = req.body;
     try {
@@ -47,7 +47,60 @@ app.post("/addProduct" , async(req , res) => {
         console.log(err);
     }
 });
+//2. shvvh 
+app.get("/products", async (req,res)=>{
+  try{
+    let query = 'select * from product';
+    const params =[];
 
+    if(category){
+      query += 'where category = $1';
+      params.push(category);
+    }
+    const result = await pool.query(query,params);
+    return res.status(200).json(result.rows);
+  } catch(err){
+    console.error('error',err.stack);
+    return res.status(500).json({message:'error'});
+   
+  }
+});
+//3.bvrtgvvleh
+app.post("/register", async(req,res)=>{
+  const {email,password}=req.body;
+  try{
+    const pass = await bcrypt.hash(password,10);
+    const result = await pool.query('insert into users (email,password) values ($1,$2) returning *',
+      [email,pass]
+    );
+    return res.status(201).json({message:'amjilttai',user: result.rows[0]});
+  }catch(err){
+    console.error('err',err.stack);
+    return res.status(500).json({message:'err'});
+  }
+});
+//4.nevtreh
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (result.rows.length === 0) {
+      return res.status(401).json({ message: '!' });
+    }
+
+    const user = result.rows[0];
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: '!' });
+    }
+
+    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+    return res.status(200).json({ message: 'amjilttai', token });
+  } catch (err) {
+    console.error('Err', err.stack);
+    return res.status(500).json({ message: 'Err' });
+  }
+});
 app.listen(3000, () => {
   console.log('Server running on http://localhost:3000');
 });
