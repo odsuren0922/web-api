@@ -48,21 +48,21 @@ app.post("/addProduct" , async(req , res) => {
     }
 });
 //2. shvvh 
-app.get("/products", async (req,res)=>{
-  try{
-    let query = 'select * from product';
-    const params =[];
-
-    if(category){
-      query += 'where category = $1';
+app.get("/products", async (req, res) => {
+  try {
+    let query = 'SELECT * FROM product';
+    const params = [];
+    const { category } = req.query;
+    if (category) {
+      query += ' WHERE category = $1';
       params.push(category);
     }
-    const result = await pool.query(query,params);
+
+    const result = await pool.query(query, params);
     return res.status(200).json(result.rows);
-  } catch(err){
-    console.error('error',err.stack);
-    return res.status(500).json({message:'error'});
-   
+  } catch (err) {
+    console.error('Error:', err.stack);
+    return res.status(500).json({ message: 'Error' });
   }
 });
 //3.bvrtgvvleh
