@@ -1,5 +1,5 @@
 CREATE TABLE products (
-    id INT PRIMARY KEY,                     
+    id SERIAL  PRIMARY KEY,                     
     name VARCHAR(255),                        
     category VARCHAR(100),                     
     brand VARCHAR(100),                        
